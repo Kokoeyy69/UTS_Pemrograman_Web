@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Stok & Katalog Buku</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        main {
+            padding: 24px;
+            max-width: 1100px;
+            margin: auto;
+        }
+        
+        table img {
+            width: 60px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .form-add {
+            margin-top: 18px;
+            background: var(--card);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        .readonly-note {
+            margin-top: 10px;
+            font-style: italic;
+            color: var(--muted);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Toko Buku Online</h1>
+        <div class="user-info">
+            <button class="btn btn-outline" onclick="location.href='dashboard.html'">Kembali</button>
+        </div>
+    </header>
+
+    <main>
+        <h2>📚 Katalog & Stok Buku</h2>
+
+        <table id="tabelBuku">
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Cover</th>
+                    <th>Nama Buku</th>
+                    <th>Jenis</th>
+                    <th>Edisi</th>
+                    <th>Stok</th>
+                    <th>Harga</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <section class="form-add" id="formSection">
+            <h3>Tambah Stok Baru</h3>
+            <form id="formTambah">
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <input id="kode" placeholder="Kode Barang" style="flex:1;min-width:160px">
+                    <input id="nama" placeholder="Nama Buku" style="flex:2;min-width:200px">
+                    <input id="jenis" placeholder="Jenis" style="flex:1;min-width:140px">
+                    <input id="edisi" placeholder="Edisi" style="width:90px">
+                    <input id="stok" placeholder="Stok" type="number" style="width:120px">
+                    <input id="harga" placeholder="Harga" style="width:140px">
+                </div>
+                <div style="margin-top:10px">
+                    <button class="btn btn-primary">Tambah</button>
+                </div>
+            </form>
+        </section>
+
+        <p id="readonlyNote" class="readonly-note" style="display:none;">
+            Mode katalog: Anda hanya dapat melihat daftar buku.
+        </p>
+    </main>
+
+    <footer>© 2025 Toko Buku UT</footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("✅ stok.html dimuat");
+
+            // Cek login
+            const user = JSON.parse(localStorage.getItem('userLogged'));
+            if (!user) {
+                alert('Silakan login terlebih dahulu.');
+                location.href = 'login.html';
+                return;
+            }
+
+            // Pastikan data dari data.js terbaca
+            if (!window.dataKatalogBuku) {
+                alert("❌ File data.js belum terbaca atau salah urutan script!");
+                return;
+            }
+
+            // 🧠 Inisialisasi data katalog
+            let dataStorage = localStorage.getItem('dataKatalogBuku');
+
+            // Jika data belum ada, kosong, atau rusak → reset dari data.js
+            if (!dataStorage || dataStorage === "[]" || dataStorage === "null") {
+                console.warn("🧹 Data katalog kosong/rusak, reset dari data.js...");
+                localStorage.setItem('dataKatalogBuku', JSON.stringify(window.dataKatalogBuku));
+                dataStorage = localStorage.getItem('dataKatalogBuku');
+            }
+
+            const data = JSON.parse(dataStorage);
+            console.log("🗂️ Data buku dari storage:", data);
+
+            const tbody = document.querySelector('#tabelBuku tbody');
+
+            // Render tabel buku
+            tbody.innerHTML = "";
+            data.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+            <td>${b.kodeBarang}</td>
+            <td><img src="${b.cover}" alt=""></td>
+            <td>${b.namaBarang}</td>
+            <td>${b.jenisBarang}</td>
+            <td>${b.edisi}</td>
+            <td>${b.stok}</td>
+            <td>${b.harga}</td>`;
+                tbody.appendChild(tr);
+            });
+
+            // Mode admin/user
+            if (user.role !== 'Admin') {
+                document.getElementById('formSection').style.display = 'none';
+                document.getElementById('readonlyNote').style.display = 'block';
+            } else {
+                const form = document.getElementById('formTambah');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const kode = document.getElementById('kode').value.trim();
+                    const nama = document.getElementById('nama').value.trim();
+                    const jenis = document.getElementById('jenis').value.trim();
+                    const edisi = document.getElementById('edisi').value.trim();
+                    const stok = parseInt(document.getElementById('stok').value);
+                    const harga = document.getElementById('harga').value.trim();
+
+                    if (!kode || !nama || !jenis || !edisi || isNaN(stok) || !harga) {
+                        alert('Isi semua kolom!');
+                        return;
+                    }
+
+                    data.push({
+                        kodeBarang: kode,
+                        namaBarang: nama,
+                        jenisBarang: jenis,
+                        edisi: edisi,
+                        stok: stok,
+                        harga: harga,
+                        cover: 'img/default_cover.jpg'
+                    });
+
+                    localStorage.setItem('dataKatalogBuku', JSON.stringify(data));
+                    alert('✅ Stok baru ditambahkan');
+                    location.reload();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

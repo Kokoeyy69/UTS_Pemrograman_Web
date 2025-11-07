@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Manajemen Pengguna</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        main {
+            padding: 24px;
+            max-width: 900px;
+            margin: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        
+        th {
+            background: var(--primary);
+            color: #fff;
+        }
+        
+        td a {
+            color: var(--primary);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
+        .form-add {
+            background: var(--card);
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        input,
+        select {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        
+        .btn-small {
+            font-size: 0.9em;
+            padding: 4px 8px;
+        }
+        
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .btn-del {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .btn-edit:hover,
+        .btn-del:hover {
+            opacity: 0.8;
+        }
+        /* 🔹 Modal */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+        }
+        
+        .close {
+            float: right;
+            font-size: 22px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .modal table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .modal th,
+        .modal td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+        
+        .modal th {
+            background: #f8f9fa;
+        }
+        
+        .export {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Toko Buku Online</h1>
+        <div class="user-info">
+            <button class="btn btn-outline" onclick="location.href='dashboard.html'">Kembali</button>
+        </div>
+    </header>
+
+    <main>
+        <h2>👥 Manajemen Pengguna</h2>
+
+        <table id="tabelUser">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <section class="form-add">
+            <h3>Tambah / Edit Pengguna</h3>
+            <form id="formUser">
+                <input type="hidden" id="editId">
+                <label>Nama</label>
+                <input id="nama" required>
+                <label>Email</label>
+                <input id="email" type="email" required>
+                <label>Password</label>
+                <input id="password" type="password" required>
+                <label>Role</label>
+                <select id="role" required>
+          <option value="User">User</option>
+          <option value="Admin">Admin</option>
+        </select>
+                <div style="margin-top:10px;">
+                    <button class="btn btn-primary" type="submit">Simpan</button>
+                    <button type="button" class="btn btn-outline" id="btnReset">Reset</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>© 2025 Toko Buku UT</footer>
+
+    <!-- 🔹 Modal Riwayat -->
+    <div class="modal" id="modalRiwayat">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Riwayat Pesanan <span id="modalNama"></span></h3>
+
+            <table id="tabelRiwayat">
+                <thead>
+                    <tr>
+                        <th>Kode DO</th>
+                        <th>Tanggal</th>
+                        <th>Jumlah</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Ubah</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div id="noHistory" style="text-align:center; color:#777; padding:10px; display:none;">Tidak ada riwayat pesanan.</div>
+
+            <div class="export">
+                <button id="btnExcelUser" class="btn btn-primary">⬇️ Ekspor Excel</button>
+                <button id="btnPDFUser" class="btn btn-outline">🧾 Ekspor PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 Modal Detail Buku -->
+    <div class="modal" id="modalDetail">
+        <div class="modal-content">
+            <span class="close" onclick="closeDetail()">&times;</span>
+            <h3>📦 Detail Pesanan <span id="kodeDetail"></span></h3>
+            <table id="tabelDetail">
+                <thead>
+                    <tr>
+                        <th>Nama Buku</th>
+                        <th>Jumlah</th>
+                        <th>Harga</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('userLogged'));
+        if (!user) {
+            alert('Silakan login.');
+            location.href = 'login.html';
+        }
+        if (user.role !== 'Admin') {
+            alert('Akses khusus Admin!');
+            location.href = 'dashboard.html';
+        }
+
+        let users = JSON.parse(localStorage.getItem('dataPengguna')) || window.dataPengguna || [];
+        const historyAll = JSON.parse(localStorage.getItem('historyData')) || [];
+        let trackingData = JSON.parse(localStorage.getItem('trackingData')) || {};
+        const checkoutDetail = JSON.parse(localStorage.getItem('checkoutDetail')) || {};
+        const tbody = document.querySelector('#tabelUser tbody');
+
+        function renderTable() {
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${u.id}</td>
+          <td><a onclick="lihatRiwayat('${u.nama}')">${u.nama}</a></td>
+          <td>${u.email}</td>
+          <td>${u.role}</td>
+          <td>
+            <button class="btn-small btn-edit" onclick="editUser(${u.id})">Edit</button>
+            <button class="btn-small btn-del" onclick="hapusUser(${u.id})">Hapus</button>
+          </td>`;
+                tbody.appendChild(tr);
+            });
+            localStorage.setItem('dataPengguna', JSON.stringify(users));
+        }
+
+        // CRUD User
+        document.getElementById('formUser').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const nama = document.getElementById('nama').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const role = document.getElementById('role').value;
+
+            if (!nama || !email || !password) return alert('Lengkapi semua kolom!');
+
+            if (id) {
+                const idx = users.findIndex(u => u.id == id);
+                users[idx] = {
+                    id: parseInt(id),
+                    nama,
+                    email,
+                    password,
+                    role
+                };
+                showNotify('Data diperbarui', 'success');
+            } else {
+                const newId = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1;
+                users.push({
+                    id: newId,
+                    nama,
+                    email,
+                    password,
+                    role
+                });
+                showNotify('Pengguna ditambah', 'success');
+            }
+
+            e.target.reset();
+            document.getElementById('editId').value = '';
+            renderTable();
+        });
+
+        window.editUser = id => {
+            const u = users.find(x => x.id === id);
+            document.getElementById('editId').value = u.id;
+            document.getElementById('nama').value = u.nama;
+            document.getElementById('email').value = u.email;
+            document.getElementById('password').value = u.password;
+            document.getElementById('role').value = u.role;
+        };
+
+        window.hapusUser = id => {
+            if (!confirm('Yakin ingin menghapus pengguna ini?')) return;
+            users = users.filter(u => u.id !== id);
+            renderTable();
+        };
+
+        // 🔹 Modal Riwayat
+        window.lihatRiwayat = nama => {
+            const modal = document.getElementById('modalRiwayat');
+            const tbody = document.querySelector('#tabelRiwayat tbody');
+            const dataUser = historyAll.filter(h => h.nama.toLowerCase() === nama.toLowerCase());
+            document.getElementById('modalNama').textContent = nama;
+            tbody.innerHTML = '';
+            if (dataUser.length === 0) {
+                document.getElementById('noHistory').style.display = 'block';
+            } else {
+                document.getElementById('noHistory').style.display = 'none';
+                dataUser.forEach(h => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+            <td><a onclick="lihatDetail('${h.no}')">${h.no}</a></td>
+            <td>${h.tanggal}</td>
+            <td>${h.jumlah}</td>
+            <td>${h.total}</td>
+            <td>${h.status}</td>
+            <td>
+              <select data-kode="${h.no}" class="ubahStatus">
+                <option value="">--Pilih--</option>
+                <option>Menunggu Konfirmasi</option>
+                <option>Dalam Proses</option>
+                <option>Dikirim</option>
+                <option>Selesai</option>
+              </select>
+            </td>`;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            modal.dataset.nama = nama;
+            modal.style.display = 'flex';
+        };
+
+        // 🔹 Lihat detail buku
+        window.lihatDetail = kode => {
+            const modal = document.getElementById('modalDetail');
+            const tbody = document.querySelector('#tabelDetail tbody');
+            document.getElementById('kodeDetail').textContent = kode;
+            tbody.innerHTML = '';
+
+            const list = checkoutDetail[kode] || [];
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#777">Tidak ada data buku.</td></tr>`;
+            } else {
+                list.forEach(item => {
+                    const subtotal = item.jumlah * item.harga;
+                    tbody.innerHTML += `<tr><td>${item.nama}</td><td>${item.jumlah}</td><td>Rp ${item.harga.toLocaleString()}</td><td>Rp ${subtotal.toLocaleString()}</td></tr>`;
+                });
+            }
+            modal.style.display = 'flex';
+        };
+
+        // 🔹 Ubah status
+        document.addEventListener('change', e => {
+            if (!e.target.classList.contains('ubahStatus')) return;
+            const kode = e.target.dataset.kode;
+            const status = e.target.value;
+            const idx = historyAll.findIndex(h => h.no === kode);
+            if (idx === -1) return;
+            historyAll[idx].status = status;
+            localStorage.setItem('historyData', JSON.stringify(historyAll));
+            showNotify(`Status ${kode} → ${status}`, 'success');
+        });
+
+        // 🔹 Ekspor Excel & PDF
+        document.getElementById('btnExcelUser').addEventListener('click', () => {
+            const nama = document.getElementById('modalRiwayat').dataset.nama;
+            const dataUser = historyAll.filter(h => h.nama.toLowerCase() === nama.toLowerCase());
+            const ws = XLSX.utils.json_to_sheet(dataUser);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, nama);
+            XLSX.writeFile(wb, `Riwayat_${nama}.xlsx`);
+        });
+
+        document.getElementById('btnPDFUser').addEventListener('click', () => {
+            const {
+                jsPDF
+            } = window.jspdf;
+            const nama = document.getElementById('modalRiwayat').dataset.nama;
+            const dataUser = historyAll.filter(h => h.nama.toLowerCase() === nama.toLowerCase());
+            const doc = new jsPDF();
+            doc.text(`Riwayat Pesanan - ${nama}`, 14, 16);
+            doc.autoTable({
+                startY: 22,
+                head: [
+                    ['Kode DO', 'Tanggal', 'Jumlah', 'Total', 'Status']
+                ],
+                body: dataUser.map(h => [h.no, h.tanggal, h.jumlah, h.total, h.status])
+            });
+            doc.save(`Riwayat_${nama}.pdf`);
+        });
+
+        window.closeModal = () => document.getElementById('modalRiwayat').style.display = 'none';
+        window.closeDetail = () => document.getElementById('modalDetail').style.display = 'none';
+
+        renderTable();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pemesanan</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        main {
+            padding: 24px;
+            max-width: 1000px;
+            margin: auto;
+        }
+        
+        .total {
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Toko Buku Online</h1>
+        <div class="user-info">
+            <button class="btn btn-outline" onclick="location.href='dashboard.html'">Kembali</button>
+        </div>
+    </header>
+
+    <main>
+        <form id="formPesan">
+            <h2>Informasi Pemesan</h2>
+            <label>Nama Pemesan</label><input id="namaPemesan" required>
+            <label>Email</label><input id="emailPemesan" type="email" required>
+            <label>Alamat</label><input id="alamatPemesan" required>
+
+            <h3>Daftar Buku</h3>
+            <table id="tabelPesan">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Jumlah</th>
+                        <th>Harga</th>
+                        <th>Subtotal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <select id="pilihBuku"></select>
+                <input type="number" id="jumlahBuku" value="1" min="1" style="width:100px">
+                <button type="button" class="btn btn-primary" id="btnTambah">Tambah</button>
+            </div>
+
+            <div class="total" id="totalText">Total: Rp 0</div>
+
+            <h3>Pembayaran</h3>
+            <select id="metode">
+      <option value="">--Pilih--</option>
+      <option>Transfer Bank</option>
+      <option>OVO/Dana/GoPay</option>
+      <option>COD</option>
+    </select>
+
+            <div style="margin-top:12px">
+                <button class="btn btn-primary">Kirim Pesanan</button>
+            </div>
+        </form>
+    </main>
+
+    <footer>© 2025 Toko Buku UT</footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('userLogged'));
+        if (!user) {
+            alert('Silakan login.');
+            location.href = 'login.html';
+        }
+
+        // 🔹 Auto isi data user
+        document.getElementById('namaPemesan').value = user.nama;
+        document.getElementById('emailPemesan').value = user.email;
+
+        // 🔹 Muat stok buku
+        if (localStorage.getItem('dataKatalogBuku')) {
+            window.dataKatalogBuku = JSON.parse(localStorage.getItem('dataKatalogBuku'));
+        }
+
+        const pilihBuku = document.getElementById('pilihBuku');
+        (window.dataKatalogBuku || []).forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.kodeBarang;
+            opt.textContent = `${b.namaBarang} (${b.harga})`;
+            pilihBuku.appendChild(opt);
+        });
+
+        const tbody = document.querySelector('#tabelPesan tbody');
+        const pesanan = [];
+
+        function render() {
+            tbody.innerHTML = '';
+            let total = 0;
+            pesanan.forEach((p, i) => {
+                const sub = p.jumlah * p.harga;
+                total += sub;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+      <td>${p.nama}</td>
+      <td>${p.jumlah}</td>
+      <td>Rp ${p.harga.toLocaleString()}</td>
+      <td>Rp ${sub.toLocaleString()}</td>
+      <td><button class="btn btn-danger" onclick="hapus(${i})">Hapus</button></td>`;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('totalText').textContent = `Total: Rp ${total.toLocaleString()}`;
+        }
+
+        document.getElementById('btnTambah').addEventListener('click', () => {
+            const kode = pilihBuku.value;
+            const jumlah = parseInt(document.getElementById('jumlahBuku').value);
+            if (!kode || jumlah < 1) {
+                alert('Pilih buku dan jumlah.');
+                return;
+            }
+            const buku = window.dataKatalogBuku.find(b => b.kodeBarang === kode);
+            const harga = parseInt(buku.harga.replace(/\D/g, ''));
+            pesanan.push({
+                kode,
+                nama: buku.namaBarang,
+                jumlah,
+                harga
+            });
+            render();
+        });
+
+        window.hapus = i => {
+            pesanan.splice(i, 1);
+            render();
+        };
+
+        document.getElementById('formPesan').addEventListener('submit', e => {
+            e.preventDefault();
+
+            const nama = user.nama;
+            const email = user.email;
+            const alamat = document.getElementById('alamatPemesan').value.trim();
+            const metode = document.getElementById('metode').value;
+
+            if (!alamat || !metode) {
+                alert('Lengkapi data.');
+                return;
+            }
+            if (pesanan.length === 0) {
+                alert('Tambahkan minimal satu buku.');
+                return;
+            }
+
+            const total = pesanan.reduce((sum, p) => sum + p.jumlah * p.harga, 0);
+            const tanggal = new Date().toISOString().split('T')[0];
+            const kodeDO = "DO" + Date.now();
+
+            // 🔹 Kurangi stok
+            pesanan.forEach(p => {
+                const buku = window.dataKatalogBuku.find(b => b.kodeBarang === p.kode);
+                if (buku) buku.stok = Math.max(0, buku.stok - p.jumlah);
+            });
+            localStorage.setItem('dataKatalogBuku', JSON.stringify(window.dataKatalogBuku));
+
+            // 🔹 Simpan riwayat user
+            const history = JSON.parse(localStorage.getItem('historyData')) || [];
+            history.push({
+                no: kodeDO,
+                nama,
+                tanggal,
+                jumlah: pesanan.reduce((sum, p) => sum + p.jumlah, 0),
+                total: `Rp ${total.toLocaleString()}`,
+                status: 'Menunggu Konfirmasi'
+            });
+            localStorage.setItem('historyData', JSON.stringify(history));
+
+            // 🔹 Tracking
+            const tracking = JSON.parse(localStorage.getItem('trackingData')) || {};
+            tracking[kodeDO] = {
+                nomorDO: kodeDO,
+                nama,
+                ekspedisi: '-',
+                tanggalKirim: tanggal,
+                paket: '-',
+                total: `Rp ${total.toLocaleString()}`,
+                status: 'Menunggu Konfirmasi',
+                perjalanan: [{
+                    waktu: new Date().toLocaleString(),
+                    keterangan: 'Pesanan dibuat dan menunggu konfirmasi admin.'
+                }]
+            };
+            localStorage.setItem('trackingData', JSON.stringify(tracking));
+
+            // 🔹 Detail
+            const checkoutDetail = JSON.parse(localStorage.getItem('checkoutDetail') || '{}');
+            checkoutDetail[kodeDO] = pesanan;
+            localStorage.setItem('checkoutDetail', JSON.stringify(checkoutDetail));
+
+            console.log("✅ Pesanan tersimpan:", history);
+
+            alert(`Pesanan berhasil dibuat!\nKode DO: ${kodeDO}`);
+            location.href = 'history.html';
+        });
+    </script>
+</body>
+
+</html>

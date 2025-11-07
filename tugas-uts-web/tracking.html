@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Tracking Pengiriman</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        main {
+            padding: 24px;
+            max-width: 900px;
+            margin: auto;
+        }
+        
+        .progress-bar {
+            height: 14px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-bar div {
+            height: 100%;
+            background: var(--primary);
+            width: 0;
+            transition: width .5s;
+        }
+        
+        #hasil {
+            display: none;
+            margin-top: 16px;
+            background: var(--card);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        table th {
+            text-align: left;
+            width: 160px;
+        }
+        
+        .timeline li {
+            margin-bottom: 10px;
+            padding-left: 8px;
+            border-left: 3px solid var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Toko Buku Online</h1>
+        <div class="user-info">
+            <button class="btn btn-outline" onclick="location.href='dashboard.html'">Kembali</button>
+        </div>
+    </header>
+
+    <main>
+        <h2>📦 Lacak Pengiriman</h2>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <input id="noDO" placeholder="Masukkan nomor DO (contoh: DO20251106...)" style="flex:1;">
+            <button id="btnCari" class="btn btn-primary">Cari</button>
+        </div>
+
+        <section id="hasil">
+            <div id="info"></div>
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+            <div id="statusText" style="margin-top:8px;font-weight:700;color:var(--primary)"></div>
+
+            <h4 style="margin-top:12px;">Riwayat Perjalanan</h4>
+            <ul id="timeline" class="timeline"></ul>
+        </section>
+    </main>
+
+    <footer>© 2025 Toko Buku UT</footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('userLogged'));
+        if (!user) {
+            alert('Silakan login.');
+            location.href = 'login.html';
+        }
+
+        const btn = document.getElementById('btnCari');
+        const hasil = document.getElementById('hasil');
+        const info = document.getElementById('info');
+        const progress = document.getElementById('progress');
+        const statusText = document.getElementById('statusText');
+        const timeline = document.getElementById('timeline');
+
+        btn.addEventListener('click', () => {
+            const noDO = document.getElementById('noDO').value.trim();
+            if (!noDO) {
+                alert('Masukkan nomor DO.');
+                return;
+            }
+
+            // 🔹 Gabungkan data bawaan (data.js) & data hasil checkout/laporan (localStorage)
+            const localTrack = JSON.parse(localStorage.getItem('trackingData') || '{}');
+            const allTracking = {...(window.dataTracking || {}),
+                ...localTrack
+            };
+
+            const data = allTracking[noDO];
+            if (!data) {
+                alert('Nomor DO tidak ditemukan.');
+                hasil.style.display = 'none';
+                return;
+            }
+
+            hasil.style.display = 'block';
+            info.innerHTML = `
+        <table>
+          <tr><th>Nomor DO</th><td>${data.nomorDO}</td></tr>
+          <tr><th>Nama Pemesan</th><td>${data.nama}</td></tr>
+          <tr><th>Ekspedisi</th><td>${data.ekspedisi || '-'}</td></tr>
+          <tr><th>Tanggal Kirim</th><td>${data.tanggalKirim}</td></tr>
+          <tr><th>Paket</th><td>${data.paket}</td></tr>
+          <tr><th>Total</th><td>${data.total}</td></tr>
+        </table>
+      `;
+
+            // 🔹 Update progress bar berdasarkan status
+            let val = 20;
+            if (data.status.includes('Menunggu')) val = 20;
+            else if (data.status.includes('Dalam Proses')) val = 50;
+            else if (data.status.includes('Dikirim')) val = 80;
+            else if (data.status.includes('Selesai')) val = 100;
+            progress.style.width = val + '%';
+            statusText.textContent = data.status;
+
+            // 🔹 Timeline perjalanan
+            timeline.innerHTML = '';
+            (data.perjalanan || []).forEach(p => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${p.waktu}</strong><br>${p.keterangan}`;
+                timeline.appendChild(li);
+            });
+        });
+    </script>
+</body>
+
+</html>
