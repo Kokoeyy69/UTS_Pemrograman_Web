@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+            padding: 24px;
+            max-width: 1000px;
+            margin: auto;
+        }
+        
+        .menu-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            margin-top: 24px;
+        }
+        
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card h3 {
+            margin: 12px 0 6px;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Toko Buku Online</h1>
+        <div class="user-info">
+            <span id="userName"></span>
+            <button class="btn btn-outline" id="btnLogout">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <h2 id="welcomeText">Selamat datang!</h2>
+        <div class="menu-grid" id="menuGrid"></div>
+    </main>
+
+    <footer>© 2025 Toko Buku UT</footer>
+
+    <script src="theme.js"></script>
+    <script>
+        // ✅ Cek login
+        const user = JSON.parse(localStorage.getItem('userLogged'));
+        if (!user) {
+            alert('Silakan login terlebih dahulu.');
+            location.href = 'login.html';
+        }
+
+        // ✅ Tampilkan nama user
+        document.getElementById('userName').textContent = `${user.nama} (${user.role})`;
+        document.getElementById('welcomeText').textContent = `Halo, ${user.nama}!`;
+
+        // ✅ Menu role-based
+        const menuAdmin = [{
+            title: 'Kelola Stok Buku',
+            icon: '📚',
+            link: 'stok.html'
+        }, {
+            title: 'Laporan Penjualan',
+            icon: '📈',
+            link: 'laporan.html'
+        }, {
+            title: 'Data Pengguna',
+            icon: '👥',
+            link: 'user.html'
+        }, {
+            title: 'Tracking Pengiriman',
+            icon: '🚚',
+            link: 'tracking.html'
+        }];
+
+        const menuUser = [{
+            title: 'Pesan Buku',
+            icon: '🛒',
+            link: 'checkout.html'
+        }, {
+            title: 'Riwayat Pesanan',
+            icon: '🧾',
+            link: 'history.html'
+        }, {
+            title: 'Lacak Pengiriman',
+            icon: '🚚',
+            link: 'tracking.html'
+        }, {
+            title: 'Katalog Buku',
+            icon: '📖',
+            link: 'stok.html'
+        }];
+
+        const activeMenu = user.role === 'Admin' ? menuAdmin : menuUser;
+
+        // ✅ Render menu dinamis
+        const menu = document.getElementById('menuGrid');
+        activeMenu.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+        <div style="font-size:48px">${item.icon}</div>
+        <h3>${item.title}</h3>`;
+            div.addEventListener('click', () => location.href = item.link);
+            menu.appendChild(div);
+        });
+
+        // ✅ Logout tunggal
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            if (confirm('Yakin ingin keluar dari akun ini?')) {
+                localStorage.removeItem('userLogged');
+                location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+
+</html>
