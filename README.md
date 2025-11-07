@@ -47,9 +47,10 @@ tugas-uts-web/
 - Pesan kesalahan dengan alert  
 
 📸 **Tampilan (User Mode)**  
-![Login - User](./Screenshot%20from%202025-11-08%2005-22-46.png)  
+ <img width="1366" height="768" alt="Screenshot from 2025-11-08 05-22-46" src="https://github.com/user-attachments/assets/34f4cbde-90ea-4fcd-b5d6-d70ce2ca9ab5" />  
 📸 **Tampilan (Admin Mode)**  
-![Login - Admin](./Screenshot%20from%202025-11-08%2005-25-54.png)
+ <img width="1366" height="768" alt="Screenshot from 2025-11-08 05-25-54" src="https://github.com/user-attachments/assets/d6443e1b-ad4a-4382-8996-0cc1a78e0925" />
+
 
 ---
 
@@ -59,9 +60,11 @@ tugas-uts-web/
 - Tombol logout dan mode tampilan  
 
 📸 **User Dashboard**  
-![Dashboard User](./Screenshot%20from%202025-11-08%2005-22-53.png)  
+ <img width="1366" height="768" alt="Screenshot from 2025-11-08 05-22-53" src="https://github.com/user-attachments/assets/48484963-fd96-4cc6-ad06-216d163948d9" />
+
 📸 **Admin Dashboard**  
-![Dashboard Admin](./Screenshot%20from%202025-11-08%2005-26-05.png)
+ <img width="1366" height="768" alt="Screenshot from 2025-11-08 05-26-05" src="https://github.com/user-attachments/assets/2056fca7-ae98-4380-b96c-8ecf89f2ab92" />
+
 
 ---
 
@@ -72,7 +75,7 @@ tugas-uts-web/
 - Validasi sebelum pengiriman  
 
 📸 **Halaman Pemesanan**  
-![Checkout](./Screenshot%20from%202025-11-08%2005-23-17.png)
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-23-17" src="https://github.com/user-attachments/assets/d47fd20e-4f8e-4e57-967c-14bc236b13bc" />
 
 ---
 
@@ -82,8 +85,8 @@ tugas-uts-web/
 - Status pesanan muncul dalam modal box  
 
 📸 **Riwayat Pesanan & Detail**  
-![History](./Screenshot%20from%202025-11-08%2005-23-25.png)  
-![Detail Pesanan](./Screenshot%20from%202025-11-08%2005-23-28.png)
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-23-25" src="https://github.com/user-attachments/assets/5b2e06aa-0da8-4cc1-84ce-05f355f42d18" />
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-23-28" src="https://github.com/user-attachments/assets/b21688c4-d980-4514-874a-5cd80a461e49" />
 
 ---
 
@@ -93,9 +96,9 @@ tugas-uts-web/
 - Update status otomatis oleh admin  
 
 📸 **Tracking (User)**  
-![Tracking User](./Screenshot%20from%202025-11-08%2005-23-54.png)  
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-23-54" src="https://github.com/user-attachments/assets/37c1cf6a-b13e-41e9-aad0-1411183a0000" />
 📸 **Tracking (Admin update)**  
-![Tracking Admin](./Screenshot%20from%202025-11-08%2005-28-50.png)
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-26-42" src="https://github.com/user-attachments/assets/00af1a6c-04c6-4210-9265-441f3ead2873" />
 
 ---
 
@@ -105,8 +108,8 @@ tugas-uts-web/
 - Admin dapat menambah atau mengubah data buku  
 
 📸 **Tampilan**  
-![Katalog](./Screenshot%20from%202025-11-08%2005-24-01.png)  
-![Katalog Dark Mode](./Screenshot%20from%202025-11-08%2005-26-13.png)
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-24-01" src="https://github.com/user-attachments/assets/c8bd61e3-1f2a-433b-ac13-f3c169d72a8d" />
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-26-13" src="https://github.com/user-attachments/assets/6e4adf68-4f68-4b95-9968-774e571e4258" />
 
 ---
 
@@ -117,7 +120,7 @@ tugas-uts-web/
 - Ekspor ke **Excel / PDF / Cetak langsung**
 
 📸 **Tampilan**  
-![Laporan Penjualan](./Screenshot%20from%202025-11-08%2005-26-42.png)
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-26-42" src="https://github.com/user-attachments/assets/4c35085b-37fc-4c20-8c13-d45d74d822c3" />
 
 ---
 
@@ -127,7 +130,7 @@ tugas-uts-web/
 - Validasi sederhana dengan notifikasi  
 
 📸 **Tampilan**  
-![Manajemen Pengguna](./Screenshot%20from%202025-11-08%2005-27-09.png)
+<img width="1366" height="768" alt="Screenshot from 2025-11-08 05-27-09" src="https://github.com/user-attachments/assets/05dbe074-5084-49be-94a3-2a91918a3cc6" />
 
 ---
 
@@ -152,15 +155,6 @@ tugas-uts-web/
 4. Gunakan akun contoh:  
    - **User:** `rina@gmail.com` | `123456`  
    - **Admin:** `siti@gmail.com` | `123456`  
-
----
-
-## 🧑‍🎓 Identitas Pembuat  
-**Nama:** Rina Wulandari  
-**NIM:** _(isi sesuai data kamu)_  
-**Kelas:** _(contoh: PW1B)_  
-**Mata Kuliah:** Pemrograman Web 1  
-**Dosen Pengampu:** _(isi sesuai dosen kamu)_
 
 ---
 
