@@ -154,8 +154,8 @@ tugas-uts-web/
 2. Buka folder project  
 3. Jalankan `login.html` di browser  
 4. Gunakan akun contoh:  
-   - **User:** `rina@gmail.com` | `123456`  
-   - **Admin:** `siti@gmail.com` | `123456`  
+   - **User:** `rina@gmail.com` | `rina123`  
+   - **Admin:** `siti@gmail.com` | `siti123`  
 
 ---
 
